@@ -1,0 +1,19 @@
+{
+  "name": "noroshi-donate-website",
+  "version": "1.0.0",
+  "description": "Noroshi Donate — витрина, оплата и панель владельца для Minecraft-сервера Noroshi",
+  "type": "module",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development TEST_PAYMENTS=true node --watch src/server.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "check": "node scripts/check-syntax.js",
+    "backup": "node scripts/backup.js",
+    "backup:verify": "node scripts/verify-backup.js"
+  }
+}

@@ -1,0 +1,22 @@
+# Необязательное автоматическое развёртывание по SSH. Включается вручную (workflow_dispatch)
+# после того, как в Settings → Secrets and variables → Actions заданы секреты:
+#   DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH
+# Секреты приложения (.env) лежат на сервере и в репозиторий не попадают.
+name: Deploy
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Подготовка SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+      - name: Загрузка кода
+        run: rsync -az --delete --exclude '.git' --exclude '.env' --exclude 'data' ./ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
+      - name: Перезапуск
+        run: ssh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" "cd '${{ secrets.DEPLOY_PATH }}' && docker compose up -d --build"

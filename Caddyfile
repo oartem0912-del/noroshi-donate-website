@@ -1,0 +1,5 @@
+# Замените домен на свой. Caddy сам получит и продлит сертификат.
+donate.example.com {
+	encode gzip
+	reverse_proxy app:3000
+}

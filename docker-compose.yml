@@ -1,0 +1,21 @@
+# Сайт + Caddy (автоматический HTTPS). Перед запуском: cp .env.example .env и заполните значения.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      TRUST_PROXY: "true"
+    volumes:
+      - donate-data:/app/data
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on: [app]
+volumes:
+  donate-data:
+  caddy-data:
